@@ -214,4 +214,36 @@ public class NegativeAndWorkflowTests extends TestBase {
         logger.info(" COMPLETE WORKFLOW TEST PASSED");
         logTestResult("TC_WF_001", "PASSED");
     }
+
+/**
+     * TC_FAIL_001: INTENTIONAL FAILING TEST (For Bug Report Demonstration)
+     */
+    @Test(priority = 70, description = "Intentional failing test - Bug")
+    public void testIntentionalFailure() {
+        logger.info("TEST: TC_FAIL_001 - Intentional Failing Test");
+        
+        // This test is intentionally failing to demonstrate bug reporting
+        Response response = RestAssured
+                .given()
+                .when()
+                .get("/booking/1")
+                .then()
+                .statusCode(200)
+                .extract()
+                .response();
+        
+        String firstname = response.jsonPath().getString("firstname");
+        
+        // This assertion will FAIL because we expect wrong value
+        Assert.assertEquals(firstname, "INTENTIONAL_FAIL_VALUE", 
+            "This test fails intentionally to demonstrate bug reporting");
+        
+        logTestResult("TC_FAIL_001", "FAILED");
+    }
+
+
+
+
+
+
 }
