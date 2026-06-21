@@ -2,13 +2,13 @@
 
 **Version:** 1.0 | **Date:** June 2026 | **Status:** Active
 
----
+
 
 ## Executive Summary
 
 This document provides instructions for testing the Restful Booker API using Postman. The test suite covers CRUD operations (Create, Read, Update, Delete) for hotel bookings with automated token management and comprehensive test cases.
 
----
+
 
 ## Test Strategy
 
@@ -28,7 +28,6 @@ This document provides instructions for testing the Restful Booker API using Pos
 
 **Quality Target:** 95% pass rate, Response time < 2000ms
 
----
 
 ## Tool Selection & Justification
 
