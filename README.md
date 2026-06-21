@@ -241,15 +241,15 @@ Cookie: token={{token}}
 
 ## Execution Checklist
 
-- [ ] Environment created with variables
-- [ ] Collection imported
-- [ ] POST /auth test passes (token obtained)
-- [ ] GET /booking returns results
-- [ ] POST /booking creates new booking
-- [ ] PUT /booking updates successfully
-- [ ] DELETE /booking removes booking
-- [ ] All negative tests handled
-- [ ] Complete workflow passes
+-  Environment created with variables
+-  Collection imported
+-  POST /auth test passes (token obtained)
+-  GET /booking returns results
+-  POST /booking creates new booking
+-  PUT /booking updates successfully
+-  DELETE /booking removes booking
+-  All negative tests handled
+-   Complete workflow passes
 
 ---
 
