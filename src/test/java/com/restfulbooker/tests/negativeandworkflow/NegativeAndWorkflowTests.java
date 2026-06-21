@@ -101,8 +101,6 @@ public class NegativeAndWorkflowTests extends TestBase {
     @Test(priority = 60, description = "Complete booking lifecycle workflow")
     public void testCompleteBookingWorkflow() {
         logger.info("TEST: TC_WF_001 - Complete Booking Lifecycle");
-        logger.info("================================================");
-        
         // ===== STEP 1: CREATE =====
         logger.info("STEP 1  - CREATE Booking");
         BookingData originalData = BookingData.createDefaultBooking();
