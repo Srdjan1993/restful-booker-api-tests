@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Restful Booker API Test Suite" verbose="2" parallel="false">
+    
+    <test name="Authentication Tests">
+        <classes>
+            <class name="com.restfulbooker.tests.auth.AuthenticationTests"/>
+        </classes>
+    </test>
+    
+    <test name="GET Endpoint Tests">
+        <classes>
+            <class name="com.restfulbooker.tests.get.GetBookingTests"/>
+        </classes>
+    </test>
+    
+    <test name="POST Endpoint Tests">
+        <classes>
+            <class name="com.restfulbooker.tests.post.CreateBookingTests"/>
+        </classes>
+    </test>
+    
+    <test name="PUT Endpoint Tests">
+        <classes>
+            <class name="com.restfulbooker.tests.put.UpdateBookingTests"/>
+        </classes>
+    </test>
+    
+    <test name="DELETE Endpoint Tests">
+        <classes>
+            <class name="com.restfulbooker.tests.delete.DeleteBookingTests"/>
+        </classes>
+    </test>
+    
+    <test name="Negative and Workflow Tests">
+        <classes>
+            <class name="com.restfulbooker.tests.negativeandworkflow.NegativeAndWorkflowTests"/>
+        </classes>
+    </test>
+    
+</suite>

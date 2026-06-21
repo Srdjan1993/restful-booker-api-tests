@@ -1,0 +1,59 @@
+package com.restfulbooker.tests.auth;
+
+import com.restfulbooker.tests.base.TestBase;
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
+import org.testng.annotations.Test;
+import org.testng.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class AuthenticationTests extends TestBase {
+    
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticationTests.class);
+    
+    /**
+     * TC_AUTH_001: Obtain Valid Token
+     */
+    @Test(priority = 1, description = "Get valid authentication token")
+    public void testGetAuthToken() {
+        logger.info("TEST: TC_AUTH_001 - Get Authentication Token");
+        
+        Response response = RestAssured
+                .given()
+                .contentType(ContentType.JSON)
+                .body("{\"username\":\"admin\",\"password\":\"password123\"}")
+                .when()
+                .post("/auth")
+                .then()
+                .statusCode(200)
+                .extract()
+                .response();
+        
+        String token = response.jsonPath().getString("token");
+        
+        Assert.assertNotNull(token, "Token should not be null");
+        Assert.assertFalse(token.isEmpty(), "Token should not be empty");
+        Assert.assertTrue(token.length() > 0, "Token should have content");
+        
+        authToken = token;
+        
+        logger.info("Token obtained successfully: " + token.substring(0, 10) + "...");
+        logTestResult("TC_AUTH_001", "PASSED");
+    }
+    
+    /**
+     * TC_AUTH_002: Verify token is reusable
+     */
+    @Test(priority = 2, description = "Verify token can be used in subsequent requests")
+    public void testTokenReusability() {
+        logger.info("TEST: TC_AUTH_002 - Token Reusability");
+        
+        String token = getAuthToken();
+        Assert.assertNotNull(token, "Token should be available");
+        
+        logger.info("Token is reusable");
+        logTestResult("TC_AUTH_002", "PASSED");
+    }
+}

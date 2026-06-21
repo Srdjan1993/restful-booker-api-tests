@@ -1,0 +1,16 @@
+target/
+.classpath
+.project
+.settings/
+*.log
+.DS_Store
+*.class
+.idea/
+*.iml
+out/
+.vscode/
+*.swp
+*.swo
+*~
+.env
+node_modules/

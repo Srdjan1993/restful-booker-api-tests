@@ -1,0 +1,92 @@
+package com.restfulbooker.tests.post;
+
+import com.restfulbooker.tests.base.TestBase;
+import com.restfulbooker.tests.utils.BookingData;
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
+import org.testng.annotations.Test;
+import org.testng.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class CreateBookingTests extends TestBase {
+    
+    private static final Logger logger = LoggerFactory.getLogger(CreateBookingTests.class);
+    
+    /**
+     * TC_POST_001: Create New Booking
+     */
+    @Test(priority = 20, description = "Create new booking with complete data")
+    public void testCreateBooking() {
+        logger.info("TEST: TC_POST_001 - Create New Booking");
+        
+        BookingData bookingData = BookingData.createDefaultBooking();
+        
+        Response response = RestAssured
+                .given()
+                .contentType(ContentType.JSON)
+                .body(bookingData.toJson())
+                .when()
+                .post("/booking")
+                .then()
+                .statusCode(200)
+                .extract()
+                .response();
+        
+        bookingId = response.jsonPath().getInt("bookingid");
+        
+        String firstname = response.jsonPath().getString("booking.firstname");
+        String lastname = response.jsonPath().getString("booking.lastname");
+        int totalprice = response.jsonPath().getInt("booking.totalprice");
+        boolean depositpaid = response.jsonPath().getBoolean("booking.depositpaid");
+        
+        Assert.assertTrue(bookingId > 0, "Booking ID should be positive");
+        Assert.assertEquals(firstname, bookingData.firstname, "Firstname should match");
+        Assert.assertEquals(lastname, bookingData.lastname, "Lastname should match");
+        Assert.assertEquals(totalprice, bookingData.totalprice, "Price should match");
+        Assert.assertEquals(depositpaid, bookingData.depositpaid, "Deposit paid should match");
+        
+        logger.info("Booking created successfully - ID: " + bookingId);
+        logger.info("   Name: " + firstname + " " + lastname);
+        logger.info("   Price: " + totalprice);
+        logTestResult("TC_POST_001", "PASSED");
+    }
+    
+    /**
+     * TC_POST_002: Create Multiple Bookings
+     */
+    @Test(priority = 21, description = "Create multiple bookings")
+    public void testCreateMultipleBookings() {
+        logger.info("TEST: TC_POST_002 - Create Multiple Bookings");
+        
+        for (int i = 0; i < 3; i++) {
+            BookingData bookingData = new BookingData(
+                "Guest" + i,
+                "Smith" + i,
+                100 + i,
+                true,
+                "2024-02-01",
+                "2024-02-05",
+                "Breakfast"
+            );
+            
+            Response response = RestAssured
+                    .given()
+                    .contentType(ContentType.JSON)
+                    .body(bookingData.toJson())
+                    .when()
+                    .post("/booking")
+                    .then()
+                    .statusCode(200)
+                    .extract()
+                    .response();
+            
+            int id = response.jsonPath().getInt("bookingid");
+            Assert.assertTrue(id > 0, "Booking " + i + " should have valid ID");
+            logger.info(" Booking " + (i+1) + " created - ID: " + id);
+        }
+        
+        logTestResult("TC_POST_002", "PASSED");
+    }
+}

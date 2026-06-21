@@ -1,0 +1,124 @@
+package com.restfulbooker.tests.get;
+
+import com.restfulbooker.tests.base.TestBase;
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
+import org.testng.annotations.Test;
+import org.testng.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import java.util.List;
+
+public class GetBookingTests extends TestBase {
+    
+    private static final Logger logger = LoggerFactory.getLogger(GetBookingTests.class);
+    
+    /**
+     * TC_GET_001: Retrieve All Bookings
+     */
+    @Test(priority = 10, description = "Get all bookings - no filters")
+    public void testGetAllBookings() {
+        logger.info("TEST: TC_GET_001 - Get All Bookings");
+        
+        Response response = RestAssured
+                .given()
+                .when()
+                .get("/booking")
+                .then()
+                .statusCode(200)
+                .extract()
+                .response();
+        
+        List<Integer> bookingIds = response.jsonPath().getList("bookingid");
+        
+        Assert.assertNotNull(bookingIds, "Booking list should not be null");
+        Assert.assertTrue(bookingIds.size() > 0, "Should have at least one booking");
+        
+        logger.info("Found " + bookingIds.size() + " bookings");
+        logTestResult("TC_GET_001", "PASSED");
+    }
+    
+    /**
+     * TC_GET_002: Filter Bookings by Firstname
+     */
+    @Test(priority = 11, description = "Filter bookings by firstname")
+    public void testGetBookingsByFirstname() {
+        logger.info("TEST: TC_GET_002 - Filter by Firstname");
+        
+        Response response = RestAssured
+                .given()
+                .queryParam("firstname", "John")
+                .when()
+                .get("/booking")
+                .then()
+                .statusCode(200)
+                .extract()
+                .response();
+        
+        List<Integer> bookingIds = response.jsonPath().getList("bookingid");
+        
+        Assert.assertNotNull(bookingIds, "Response should contain booking IDs");
+        logger.info("Found " + bookingIds.size() + " bookings with firstname=John");
+        logTestResult("TC_GET_002", "PASSED");
+    }
+    
+    /**
+     * TC_GET_003: Filter Bookings by Date Range
+     */
+    @Test(priority = 12, description = "Filter bookings by checkin/checkout dates")
+    public void testGetBookingsByDateRange() {
+        logger.info("TEST: TC_GET_003 - Filter by Date Range");
+        
+        Response response = RestAssured
+                .given()
+                .queryParam("checkin", "2024-01-01")
+                .queryParam("checkout", "2024-01-31")
+                .when()
+                .get("/booking")
+                .then()
+                .statusCode(200)
+                .extract()
+                .response();
+        
+        List<Integer> bookingIds = response.jsonPath().getList("bookingid");
+        
+        Assert.assertNotNull(bookingIds, "Response should contain booking list");
+        logger.info("Found " + bookingIds.size() + " bookings in date range");
+        logTestResult("TC_GET_003", "PASSED");
+    }
+    
+    /**
+     * TC_GET_004: Get Specific Booking by ID
+     */
+    @Test(priority = 13, description = "Get specific booking by ID")
+    public void testGetSpecificBooking() {
+        logger.info("TEST: TC_GET_004 - Get Specific Booking");
+        
+        int bookingId = 1;
+        
+        Response response = RestAssured
+                .given()
+                .when()
+                .get("/booking/" + bookingId)
+                .then()
+                .statusCode(200)
+                .extract()
+                .response();
+        
+        String firstname = response.jsonPath().getString("firstname");
+        String lastname = response.jsonPath().getString("lastname");
+        int totalprice = response.jsonPath().getInt("totalprice");
+        boolean depositpaid = response.jsonPath().getBoolean("depositpaid");
+        String checkin = response.jsonPath().getString("bookingdates.checkin");
+        String checkout = response.jsonPath().getString("bookingdates.checkout");
+        
+        Assert.assertNotNull(firstname, "Firstname should exist");
+        Assert.assertNotNull(lastname, "Lastname should exist");
+        Assert.assertTrue(totalprice > 0, "Total price should be positive");
+        Assert.assertNotNull(checkin, "Checkin date should exist");
+        Assert.assertNotNull(checkout, "Checkout date should exist");
+        
+        logger.info("Booking " + bookingId + ": " + firstname + " " + lastname);
+        logTestResult("TC_GET_004", "PASSED");
+    }
+}

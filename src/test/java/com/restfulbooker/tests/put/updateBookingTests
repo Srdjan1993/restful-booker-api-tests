@@ -1,0 +1,121 @@
+package com.restfulbooker.tests.put;
+
+import com.restfulbooker.tests.base.TestBase;
+import com.restfulbooker.tests.utils.BookingData;
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
+import org.testng.annotations.Test;
+import org.testng.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class UpdateBookingTests extends TestBase {
+    
+    private static final Logger logger = LoggerFactory.getLogger(UpdateBookingTests.class);
+    
+    /**
+     * TC_PUT_001: Full Booking Update
+     */
+    @Test(priority = 30, description = "Full update of all booking fields")
+    public void testFullBookingUpdate() {
+        logger.info("TEST: TC_PUT_001 - Full Booking Update");
+        
+        BookingData originalBooking = BookingData.createDefaultBooking();
+        Response createResponse = RestAssured
+                .given()
+                .contentType(ContentType.JSON)
+                .body(originalBooking.toJson())
+                .when()
+                .post("/booking")
+                .then()
+                .statusCode(200)
+                .extract()
+                .response();
+        
+        int bookingId = createResponse.jsonPath().getInt("bookingid");
+        logger.info("   Created booking ID: " + bookingId);
+        
+        String token = getAuthToken();
+        
+        BookingData updateData = BookingData.createUpdateBooking();
+        
+        Response updateResponse = RestAssured
+                .given()
+                .contentType(ContentType.JSON)
+                .cookie("token", token)
+                .body(updateData.toJson())
+                .when()
+                .put("/booking/" + bookingId)
+                .then()
+                .statusCode(200)
+                .extract()
+                .response();
+        
+        Assert.assertEquals(updateResponse.jsonPath().getString("firstname"), 
+                          updateData.firstname, "Firstname should be updated");
+        Assert.assertEquals(updateResponse.jsonPath().getString("lastname"), 
+                          updateData.lastname, "Lastname should be updated");
+        Assert.assertEquals(updateResponse.jsonPath().getInt("totalprice"), 
+                          updateData.totalprice, "Price should be updated");
+        
+        logger.info("Booking updated - New name: " + updateData.firstname + " " + updateData.lastname);
+        logTestResult("TC_PUT_001", "PASSED");
+    }
+    
+    /**
+     * TC_PUT_002: Partial Booking Update
+     */
+    @Test(priority = 31, description = "Partial update - only firstname and lastname")
+    public void testPartialBookingUpdate() {
+        logger.info("TEST: TC_PUT_002 - Partial Booking Update");
+        
+        BookingData originalBooking = BookingData.createDefaultBooking();
+        Response createResponse = RestAssured
+                .given()
+                .contentType(ContentType.JSON)
+                .body(originalBooking.toJson())
+                .when()
+                .post("/booking")
+                .then()
+                .statusCode(200)
+                .extract()
+                .response();
+        
+        int bookingId = createResponse.jsonPath().getInt("bookingid");
+        int originalPrice = createResponse.jsonPath().getInt("booking.totalprice");
+        String originalCheckin = createResponse.jsonPath().getString("booking.bookingdates.checkin");
+        logger.info("   Created booking ID: " + bookingId + " with price: " + originalPrice);
+        
+        String token = getAuthToken();
+        
+        String partialUpdateJson = BookingData.createPartialUpdateJson("James", "Brown");
+        
+        Response updateResponse = RestAssured
+                .given()
+                .contentType(ContentType.JSON)
+                .cookie("token", token)
+                .body(partialUpdateJson)
+                .when()
+                .put("/booking/" + bookingId)
+                .then()
+                .statusCode(200)
+                .extract()
+                .response();
+        
+        String updatedFirstname = updateResponse.jsonPath().getString("firstname");
+        String updatedLastname = updateResponse.jsonPath().getString("lastname");
+        int updatedPrice = updateResponse.jsonPath().getInt("totalprice");
+        String updatedCheckin = updateResponse.jsonPath().getString("bookingdates.checkin");
+        
+        Assert.assertEquals(updatedFirstname, "James", "Firstname should be updated");
+        Assert.assertEquals(updatedLastname, "Brown", "Lastname should be updated");
+        Assert.assertEquals(updatedPrice, originalPrice, "Price should NOT change");
+        Assert.assertEquals(updatedCheckin, originalCheckin, "Checkin should NOT change");
+        
+        logger.info("Partial update successful");
+        logger.info("Updated name: " + updatedFirstname + " " + updatedLastname);
+        logger.info("Price unchanged: " + updatedPrice);
+        logTestResult("TC_PUT_002", "PASSED");
+    }
+}
