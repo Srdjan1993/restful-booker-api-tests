@@ -23,7 +23,7 @@ public class TestBase {
     public void setup() {
         RestAssured.baseURI = BASE_URL;
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
-        logger.info("✅ Test setup initialized - Base URL: " + BASE_URL);
+        logger.info("Test setup initialized - Base URL: " + BASE_URL);
     }
     
     /**
