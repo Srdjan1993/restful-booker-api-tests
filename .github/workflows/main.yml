@@ -9,20 +9,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Set up Java
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         java-version: '11'
         distribution: 'temurin'
+        cache: maven
 
     - name: Run Tests
-      run: mvn clean test
+      run: mvn clean test -DskipTests=false
 
     - name: Generate HTML Report
       if: always()
-      run: mvn surefire-report:report
+      run: mvn surefire-report:report || true
 
     - name: Upload Test Results
       if: always()
@@ -30,9 +31,4 @@ jobs:
       with:
         name: test-reports
         path: target/surefire-reports/
-
-    - name: Test Summary
-      if: always()
-      run: |
-        echo "✅ Tests Completed!"
-        echo "📊 Check Artifacts for HTML Reports"
+        retention-days: 30
