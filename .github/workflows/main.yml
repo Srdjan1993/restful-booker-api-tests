@@ -20,9 +20,19 @@ jobs:
     - name: Run Tests
       run: mvn clean test
 
-    - name: Upload Test Reports
+    - name: Generate HTML Report
       if: always()
-      uses: uses: actions/upload-artifact@v4
+      run: mvn surefire-report:report
+
+    - name: Upload Test Results
+      if: always()
+      uses: actions/upload-artifact@v4
       with:
         name: test-reports
         path: target/surefire-reports/
+
+    - name: Test Summary
+      if: always()
+      run: |
+        echo "✅ Tests Completed!"
+        echo "📊 Check Artifacts for HTML Reports"
