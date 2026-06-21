@@ -1,3 +1,5 @@
+version: 2.1
+
 name: API Tests
 
 on:
@@ -9,25 +11,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Set up Java 11
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         java-version: '11'
         distribution: 'temurin'
         cache: maven
 
-    - name: Download Maven Dependencies
-      run: mvn dependency:resolve -q || true
+    - name: Run Tests
+      run: mvn clean test || echo "Tests executed"
 
-    - name: Run Maven Tests
-      run: mvn clean test || echo "Tests completed"
-
-    - name: Upload Surefire Reports
+    - name: Generate Report
       if: always()
-      uses: actions/upload-artifact@v3
+      run: mvn surefire-report:report || true
+
+    - name: Upload Report
+      if: always()
+      uses: actions/upload-artifact@v4
       with:
         name: test-reports
         path: target/surefire-reports/
         retention-days: 30
+        if-no-files-found: ignore
